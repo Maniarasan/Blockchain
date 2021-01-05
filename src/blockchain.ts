@@ -22,23 +22,17 @@ export class Blockchain {
     return newBlock;
   }
 
-  getLastBlock()
-  {
-    return this.chain[this.chain.length-1]
-
+  getLastBlock() {
+    return this.chain[this.chain.length - 1];
   }
 
-  createNewTransaction(amount:any, sender:any, recipient:any){
-const newTransaction = {
-  amount:amount,
-  sender:sender,
-  recipient:recipient
-}
-this.pendingTransactions.push(newTransaction);
-
-return this.getLastBlock()['index']+1;
-
+  createNewTransaction(amount: any, sender: any, recipient: any) {
+    const newTransaction = {
+      amount: amount,
+      sender: sender,
+      recipient: recipient,
+    };
+    this.pendingTransactions.push(newTransaction);
+    return this.getLastBlock()["index"] + 1;
   }
-
-
 }
