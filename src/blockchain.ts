@@ -1,3 +1,4 @@
+const sha256 = require("sha256");
 export class Blockchain {
   chain: any = [];
   pendingTransactions: any = [];
@@ -34,5 +35,12 @@ export class Blockchain {
     };
     this.pendingTransactions.push(newTransaction);
     return this.getLastBlock()["index"] + 1;
+  }
+
+  hashBlock(previousBlockHash: any, currentBlockData: any, nonce: any) {
+    const dataAsString =
+      previousBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
+    const hash = sha256(dataAsString);
+    return hash;
   }
 }

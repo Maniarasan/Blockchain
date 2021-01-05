@@ -13,3 +13,5 @@ bitcoin.createNewTransaction(20, "ALEXb78tgug8gy","JENNYvyg78gg98yh98")
 
 
 console.log(bitcoin);
+
+console.log(bitcoin.hashBlock());
