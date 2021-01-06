@@ -40,6 +40,12 @@ app.get("/mine", (req: any, res: any) => {
   res.json({ note: "New Block mined successfully", block: newBlock });
 });
 
+
+app.use('/',(req:any,res:any)=>{
+res.send('Enter a valid endpoint')
+})
+
+
 app.listen("3000", () => {
   console.log("Listening on 3000");
 });
