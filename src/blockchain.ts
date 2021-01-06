@@ -6,6 +6,7 @@ export class Blockchain {
   constructor() {
     this.chain = [];
     this.pendingTransactions = [];
+    this.createNewBlock(100,'0','0');
   }
 
   createNewBlock(nonce: any, previousBlockHash: any, hash: any) {
