@@ -64,27 +64,36 @@ app.post("register-and-broadcast-node", (req: any, res: any) => {
     regNodesPromises.push(rp(requestOptions));
   });
 
-
   Promise.all(regNodesPromises)
-  .then((data: any) => {
-    const bulkRegisterOptions = {
-      uri: newNodeUrl + "register-nodes-bulk",
-      method: "POST",
-      body: {
-        allNetworkNodes: [...mcoin.networkNodes, mcoin.currentNodeUrl],
-      },
-      json: true,
-    };
+    .then((data: any) => {
+      const bulkRegisterOptions = {
+        uri: newNodeUrl + "register-nodes-bulk",
+        method: "POST",
+        body: {
+          allNetworkNodes: [...mcoin.networkNodes, mcoin.currentNodeUrl],
+        },
+        json: true,
+      };
 
-    return rp(bulkRegisterOptions);
-  })
-  .then((data: any) => {
-    res.json({note: 'New node registered '})
-  });
-
+      return rp(bulkRegisterOptions);
+    })
+    .then((data: any) => {
+      res.json({ note: "New node registered " });
+    });
 });
 
-app.post("register-node", (req: any, res: any) => {});
+app.post("register-node", (req: any, res: any) => {
+  const newNodeUrl = req.body.newNodeUrl;
+  const nodeNotAlreadyPresent = mcoin.networkNodes.index[newNodeUrl] == -1;
+  const notCurrentNode = mcoin.currentNodeUrl! == newNodeUrl;
+
+  if (nodeNotAlreadyPresent && notCurrentNode) {
+    mcoin.networkNodes.push(newNodeUrl);
+  }
+  res.json({ note: "New Node registered successfully" });
+
+  
+});
 
 app.post("register-nodes-bulk", (req: any, res: any) => {});
 
