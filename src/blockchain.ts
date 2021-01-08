@@ -1,12 +1,18 @@
 const sha256 = require("sha256");
+const currentNodeUrl = process.argv[3];
+
 export class Blockchain {
   chain: any = [];
   pendingTransactions: any = [];
+  currentNodeUrl;
+  networkNodes: any = [];
 
   constructor() {
     this.chain = [];
     this.pendingTransactions = [];
-    this.createNewBlock(100,'0','0');
+    this.currentNodeUrl = currentNodeUrl;
+    this.networkNodes = [];
+    this.createNewBlock(100, "0", "0");
   }
 
   createNewBlock(nonce: any, previousBlockHash: any, hash: any) {
@@ -46,14 +52,13 @@ export class Blockchain {
   }
 
   proofOfWork(previousBlockHash: any, currentBlockData: any) {
-    let nonce =0;
+    let nonce = 0;
 
-    let hash = this.hashBlock(previousBlockHash,currentBlockData,nonce)
-    while (hash.substring(0, 4) !== '0000') {
+    let hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
+    while (hash.substring(0, 4) !== "0000") {
       nonce++;
       hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
     }
     return nonce;
-
   }
 }
