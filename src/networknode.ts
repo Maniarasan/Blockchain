@@ -42,11 +42,7 @@ app.get("/mine", (req: any, res: any) => {
   res.json({ note: "New Block mined successfully", block: newBlock });
 });
 
-app.use("/", (req: any, res: any) => {
-  res.send("Enter a valid endpoint");
-});
-
-app.post("register-and-broadcast-node", (req: any, res: any) => {
+app.post("/register-and-broadcast-node", (req: any, res: any) => {
   const newNodeUrl = req.body.newNodeUrl;
   if (mcoin.networkNodes.indexOf(newNodeUrl) == -1) {
     mcoin.networkNodes.push(newNodeUrl);
@@ -82,20 +78,24 @@ app.post("register-and-broadcast-node", (req: any, res: any) => {
     });
 });
 
-app.post("register-node", (req: any, res: any) => {
+app.post("/register-node", (req: any, res: any) => {
   const newNodeUrl = req.body.newNodeUrl;
-  const nodeNotAlreadyPresent = mcoin.networkNodes.index[newNodeUrl] == -1;
-  const notCurrentNode = mcoin.currentNodeUrl! == newNodeUrl;
-
+  const nodeNotAlreadyPresent = mcoin.networkNodes.indexOf(newNodeUrl) == -1;
+  const notCurrentNode = mcoin.currentNodeUrl !== newNodeUrl;
+console.log(nodeNotAlreadyPresent, notCurrentNode)
   if (nodeNotAlreadyPresent && notCurrentNode) {
+    console.log("I am in");
     mcoin.networkNodes.push(newNodeUrl);
   }
   res.json({ note: "New Node registered successfully" });
-
-  
 });
 
-app.post("register-nodes-bulk", (req: any, res: any) => {});
+app.post("/register-nodes-bulk", (req: any, res: any) => {});
+
+app.use("/", (req: any, res: any) => {
+  console.log(req);
+  res.send("Enter a valid endpoint");
+});
 
 app.listen(port, () => {
   console.log(`Listening on ${port}`);
