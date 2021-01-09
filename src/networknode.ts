@@ -82,15 +82,33 @@ app.post("/register-node", (req: any, res: any) => {
   const newNodeUrl = req.body.newNodeUrl;
   const nodeNotAlreadyPresent = mcoin.networkNodes.indexOf(newNodeUrl) == -1;
   const notCurrentNode = mcoin.currentNodeUrl !== newNodeUrl;
-console.log(nodeNotAlreadyPresent, notCurrentNode)
+  console.log(nodeNotAlreadyPresent, notCurrentNode);
   if (nodeNotAlreadyPresent && notCurrentNode) {
     console.log("I am in");
     mcoin.networkNodes.push(newNodeUrl);
+    res.json({ note: "New Node registered successfully" });
+  } else if (!nodeNotAlreadyPresent) {
+    res.json({ note: "Cannot register already existing node" });
+  } else {
+    res.json({ note: "Cannot register current node" });
   }
-  res.json({ note: "New Node registered successfully" });
 });
 
-app.post("/register-nodes-bulk", (req: any, res: any) => {});
+app.post("/register-nodes-bulk", (req: any, res: any) => {
+  const allNetworkNodes = req.body.allNetworkNodes;
+
+  allNetworkNodes.forEach((networkNodeUrl: any) => {
+    const nodeNotAlreadyPresent =
+      mcoin.networkNodes.indexOf(networkNodeUrl) == -1;
+    const notCurrentNode = mcoin.currentNodeUrl !== networkNodeUrl;
+
+    if (nodeNotAlreadyPresent && notCurrentNode) {
+      mcoin.networkNodes.push(networkNodeUrl);
+    }
+
+    res.json({ note: "Bulk registration successful" });
+  });
+});
 
 app.use("/", (req: any, res: any) => {
   console.log(req);
