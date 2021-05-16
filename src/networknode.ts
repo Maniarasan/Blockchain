@@ -19,12 +19,10 @@ app.get("/blockchain", (req: any, res: any) => {
 });
 
 app.post("/transaction", (req: any, res: any) => {
-  const blockIndex = mcoin.createNewTransaction(
-    req.body.amount,
-    req.body.sender,
-    req.body.recipient
-  );
-  res.json({ note: `Transaction will be added in block ${blockIndex}` });
+  const newTransaction = req.body;
+
+  const blockIndex = mcoin.addTransactionToPendingTransactions(newTransaction);
+  res.json(`Transaction will be added in block ${blockIndex}`);
 });
 
 app.get("/mine", (req: any, res: any) => {
@@ -46,12 +44,13 @@ app.post("/register-and-broadcast-node", (req: any, res: any) => {
   const newNodeUrl = req.body.newNodeUrl;
   if (mcoin.networkNodes.indexOf(newNodeUrl) == -1) {
     mcoin.networkNodes.push(newNodeUrl);
+    console.log(newNodeUrl);
   }
 
   const regNodesPromises: any[] = [];
   mcoin.networkNodes.forEach((networkNodeUrl: any) => {
     const requestOptions = {
-      uri: networkNodeUrl + "register-node",
+      uri: networkNodeUrl + "/register-node",
       method: "POST",
       body: { newNodeUrl: newNodeUrl },
       json: true,
@@ -63,7 +62,7 @@ app.post("/register-and-broadcast-node", (req: any, res: any) => {
   Promise.all(regNodesPromises)
     .then((data: any) => {
       const bulkRegisterOptions = {
-        uri: newNodeUrl + "register-nodes-bulk",
+        uri: newNodeUrl + "/register-nodes-bulk",
         method: "POST",
         body: {
           allNetworkNodes: [...mcoin.networkNodes, mcoin.currentNodeUrl],
@@ -75,6 +74,9 @@ app.post("/register-and-broadcast-node", (req: any, res: any) => {
     })
     .then((data: any) => {
       res.json({ note: "New node registered " });
+    })
+    .catch((err: any) => {
+      console.log(err);
     });
 });
 
@@ -117,4 +119,29 @@ app.use("/", (req: any, res: any) => {
 
 app.listen(port, () => {
   console.log(`Listening on ${port}`);
+});
+
+app.post("/transaction/broadcast", (req: any, res: any) => {
+  const newTransaction = mcoin.createNewTransaction(
+    req.body.amount,
+    req.body.sender,
+    req.body.recipient
+  );
+
+  mcoin.addTransactionToPendingTransactions(newTransaction);
+  const requestPromises: any = [];
+  mcoin.networkNodes.forEach((networkNodeUrl: any) => {
+    const requestOptions = {
+      uri: networkNodeUrl + "/transactions",
+      method: "POST",
+      body: newTransaction,
+      json: true,
+    };
+
+    requestPromises.push(rp(requestOptions));
+  });
+
+  Promise.all(requestPromises).then((data) => {
+    res.json({ note: "Transaction created and broadcast successfully" });
+  });
 });
